@@ -3,7 +3,8 @@ package message
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+
 	"golang.org/x/crypto/sha3"
 )
 
@@ -42,5 +43,5 @@ func (msg *Message) Digest() Digest {
 
 // String representation of a PSS message
 func (msg *Message) String() string {
-	return fmt.Sprintf("PssMsg: Recipient: %s, Topic: %v", common.ToHex(msg.To), msg.Topic.String())
+	return fmt.Sprintf("PssMsg: Recipient: %s, Topic: %v", hexutil.Encode(msg.To), msg.Topic.String())
 }

@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethersphere/swarm/log"
 	"github.com/ethersphere/swarm/pss/crypto"
@@ -38,9 +38,12 @@ type KeyStore struct {
 	symKeyDecryptCacheCursor int                                // modular cursor pointing to last used, wraps on symKeyDecryptCache array
 }
 
-func loadKeyStore() *KeyStore {
+func loadKeyStore(cryptoModule crypto.Crypto) *KeyStore {
+	if cryptoModule == nil {
+		cryptoModule = crypto.New()
+	}
 	return &KeyStore{
-		Crypto:             crypto.New(),
+		Crypto:             cryptoModule,
 		pubKeyPool:         make(map[string]map[message.Topic]*peer),
 		symKeyPool:         make(map[string]map[message.Topic]*peer),
 		symKeyDecryptCache: make([]*string, defaultSymKeyCacheCapacity),
@@ -88,7 +91,7 @@ func (ks *KeyStore) SetPeerPublicKey(pubkey *ecdsa.PublicKey, topic message.Topi
 	if len(pubkeybytes) == 0 {
 		return fmt.Errorf("invalid public key: %v", pubkey)
 	}
-	pubkeyid := common.ToHex(pubkeybytes)
+	pubkeyid := hexutil.Encode(pubkeybytes)
 	psp := &peer{
 		address: address,
 	}
@@ -201,7 +204,7 @@ func (p *Pss) processAsym(pssMsg *message.Message) ([]byte, string, PssAddress, 
 		return nil, "", nil, validateError
 	}
 
-	pubkeyid := common.ToHex(p.Crypto.SerializePublicKey(recvmsg.GetSender()))
+	pubkeyid := hexutil.Encode(p.Crypto.SerializePublicKey(recvmsg.GetSender()))
 	var from PssAddress
 	p.mx.RLock()
 	if p.pubKeyPool[pubkeyid][pssMsg.Topic] != nil {

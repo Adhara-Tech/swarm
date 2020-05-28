@@ -29,7 +29,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
@@ -430,7 +429,7 @@ func TestGetPublickeyEntries(t *testing.T) {
 		t.Fatal(err)
 	}
 	remotepubkeybytes := ps.Crypto.SerializePublicKey(&remoteprivkey.PublicKey)
-	remotepubkeyhex := common.ToHex(remotepubkeybytes)
+	remotepubkeyhex := hexutil.Encode(remotepubkeybytes)
 
 	pssapi := NewAPI(ps)
 
@@ -491,7 +490,7 @@ func TestPeerCapabilityMismatch(t *testing.T) {
 	}
 	nid := enode.ID{0x01}
 	wrongpsspeer := network.NewPeer(&network.BzzPeer{
-		Peer:    protocols.NewPeer(p2p.NewPeer(nid, common.ToHex(wrongpssaddr.Over()), []p2p.Cap{wrongpsscap}), rw, nil),
+		Peer:    protocols.NewPeer(p2p.NewPeer(nid, hexutil.Encode(wrongpssaddr.Over()), []p2p.Cap{wrongpsscap}), rw, nil),
 		BzzAddr: network.NewBzzAddr(wrongpssaddr.Over(), nil),
 	}, kad)
 
@@ -503,7 +502,7 @@ func TestPeerCapabilityMismatch(t *testing.T) {
 	}
 	nid = enode.ID{0x02}
 	nopsspeer := network.NewPeer(&network.BzzPeer{
-		Peer:    protocols.NewPeer(p2p.NewPeer(nid, common.ToHex(nopssaddr.Over()), []p2p.Cap{nopsscap}), rw, nil),
+		Peer:    protocols.NewPeer(p2p.NewPeer(nid, hexutil.Encode(nopssaddr.Over()), []p2p.Cap{nopsscap}), rw, nil),
 		BzzAddr: network.NewBzzAddr(nopssaddr.Over(), nil),
 	}, kad)
 
@@ -1320,7 +1319,7 @@ func benchmarkAsymKeySend(b *testing.B) {
 	ps.SetPeerPublicKey(&privkey.PublicKey, topic, to)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ps.SendAsym(common.ToHex(ps.Crypto.SerializePublicKey(&privkey.PublicKey)), topic, msg)
+		ps.SendAsym(hexutil.Encode(ps.Crypto.SerializePublicKey(&privkey.PublicKey)), topic, msg)
 	}
 }
 func BenchmarkSymkeyBruteforceChangeaddr(b *testing.B) {

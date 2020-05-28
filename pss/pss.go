@@ -94,6 +94,7 @@ type peer struct {
 type Params struct {
 	MsgTTL              time.Duration
 	CacheTTL            time.Duration
+	cryptoModule  			crypto.Crypto
 	privateKey          *ecdsa.PrivateKey
 	SymKeyCacheCapacity int
 	AllowRaw            bool // If true, enables sending and receiving messages without builtin pss encryption
@@ -165,7 +166,7 @@ func New(k *network.Kademlia, params *Params) (*Pss, error) {
 	}
 	ps := &Pss{
 		Kademlia: k,
-		KeyStore: loadKeyStore(),
+		KeyStore: loadKeyStore(params.cryptoModule),
 
 		kademliaLB: network.NewKademliaLoadBalancer(k, false),
 		privateKey: params.privateKey,

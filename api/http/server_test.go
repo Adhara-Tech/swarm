@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"io"
 	"io/ioutil"
 	"math/big"
@@ -297,7 +298,7 @@ func TestFeedRaw(t *testing.T) {
 	if err := updateRequest.Sign(signer); err != nil {
 		t.Fatal(err)
 	}
-	log.Info("added data", "data", common.ToHex(dataBytes))
+	log.Info("added data", "data", hexutil.Encode(dataBytes))
 
 	// Build the feed update http request:
 	feedUpdateURL, err := url.Parse(fmt.Sprintf("%s/bzz-feed:/", srv.URL))
@@ -418,7 +419,7 @@ func TestBzzWithFeed(t *testing.T) {
 	if err := updateRequest.Sign(signer); err != nil {
 		t.Fatal(err)
 	}
-	log.Info("added data", "data", common.ToHex(manifestAddress))
+	log.Info("added data", "data", hexutil.Encode(manifestAddress))
 
 	// Build the feed update http request:
 	feedUpdateURL, err := url.Parse(fmt.Sprintf("%s/bzz-feed:/", srv.URL))

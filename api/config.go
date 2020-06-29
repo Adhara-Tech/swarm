@@ -120,11 +120,11 @@ func NewConfig() *Config {
 func (c *Config) Init(prvKey *ecdsa.PrivateKey, nodeKey *ecdsa.PrivateKey) error {
 
 	// create swarm dir and record key
-	err := c.createAndSetPath(c.Path, prvKey)
+	err := c.CreateAndSetPath(c.Path, prvKey)
 	if err != nil {
 		return fmt.Errorf("Error creating root swarm data directory: %v", err)
 	}
-	c.setKey(prvKey)
+	c.SetKey(prvKey)
 
 	// create the new enode record
 	// signed with the ephemeral node key
@@ -155,7 +155,7 @@ func (c *Config) ShiftPrivateKey() (privKey *ecdsa.PrivateKey) {
 	return privKey
 }
 
-func (c *Config) setKey(prvKey *ecdsa.PrivateKey) {
+func (c *Config) SetKey(prvKey *ecdsa.PrivateKey) {
 	bzzkeybytes := network.PrivateKeyToBzzKey(prvKey)
 	pubkey := crypto.FromECDSAPub(&prvKey.PublicKey)
 	pubkeyhex := hexutil.Encode(pubkey)
@@ -166,7 +166,7 @@ func (c *Config) setKey(prvKey *ecdsa.PrivateKey) {
 	c.BzzKey = keyhex
 }
 
-func (c *Config) createAndSetPath(datadirPath string, prvKey *ecdsa.PrivateKey) error {
+func (c *Config) CreateAndSetPath(datadirPath string, prvKey *ecdsa.PrivateKey) error {
 	address := crypto.PubkeyToAddress(prvKey.PublicKey)
 	bzzdirPath := filepath.Join(datadirPath, "bzz-"+common.Bytes2Hex(address.Bytes()))
 	err := os.MkdirAll(bzzdirPath, os.ModePerm)
